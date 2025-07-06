@@ -64,7 +64,9 @@ app.post('/create', async (req, res) => {
   }
 
   // Check if custom path is already in use
-  if (db.get('links').find({ customPath }).value()) {
+  const docRef = db.collection('links').doc(customPath);
+  const doc = await docRef.get();
+  if (doc.exists) {
     return res.render('index', { error: 'This custom path is already taken.', success: null });
   }
 
