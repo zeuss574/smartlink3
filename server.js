@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const path = require('path');
 const fetch = require('node-fetch');
@@ -212,8 +214,8 @@ app.get('/:customPath', async (req, res) => {
 });
 
 // --- Start Server ---
-// app.listen(port, () => {
-//   console.log(`Server is running on port ${port}`);
-// });
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
 
 module.exports = app;
