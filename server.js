@@ -79,7 +79,7 @@ app.post('/create', async (req, res) => {
     // Save the new link to our database
     db.get('links').push({ customPath, displayTitle, links, thumbnailUrl }).write();
 
-    const successUrl = `http://localhost:${port}/${customPath}`;
+    const successUrl = `https://${req.headers.host}/${customPath}`;
     res.render('index', { error: null, success: `Success! Your link is ready: ${successUrl}` });
 
   } catch (error) {
@@ -165,5 +165,5 @@ app.get('/:customPath', (req, res) => {
 
 // --- Start Server ---
 app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+  console.log(`Server is running on port ${port}`);
 });
