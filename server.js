@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const fetch = require('node-fetch');
 
 const app = express();
@@ -39,6 +40,7 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT_BASE64) {
 
 // --- Middleware ---
 app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 
