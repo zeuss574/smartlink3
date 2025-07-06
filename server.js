@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const fetch = require('node-fetch');
+const { inject } = require('@vercel/speed-insights');
 
 const app = express();
 const port = 3000;
