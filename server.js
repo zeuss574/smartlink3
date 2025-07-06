@@ -11,22 +11,30 @@ const admin = require('firebase-admin');
 
 // Check if the service account environment variable is set
 if (process.env.FIREBASE_SERVICE_ACCOUNT_BASE64) {
-  try {
-    // Decode the Base64 string and parse it as JSON
-    const serviceAccount = JSON.parse(Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_BASE64, 'base64').toString('utf8'));
+  // Check if a Firebase app has already been initialized
+  if (!admin.apps.length) {
+    console.log('FIREBASE_SERVICE_ACCOUNT_BASE64 environment variable is set.');
+    console.log('First 50 chars of Base64 string:', process.env.FIREBASE_SERVICE_ACCOUNT_BASE64.substring(0, 50) + '...');
+    try {
+      // Decode the Base64 string and parse it as JSON
+      const serviceAccount = JSON.parse(Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_BASE64, 'base64').toString('utf8'));
 
-    // Initialize Firebase Admin SDK
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount)
-    });
-    console.log('Firebase Admin SDK initialized successfully.');
+      // Initialize Firebase Admin SDK
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+      });
+      console.log('Firebase Admin SDK initialized successfully.');
 
-    // Example: Access Firestore (if you plan to use it)
-    // const db = admin.firestore();
-    // console.log('Firestore instance obtained.');
+      // Example: Access Firestore (if you plan to use it)
+      // const db = admin.firestore();
+      // console.log('Firestore instance obtained.');
 
-  } catch (error) {
-    console.error('Failed to initialize Firebase Admin SDK:', error);
+    } catch (error) {
+      console.error('Failed to initialize Firebase Admin SDK:', error);
+      console.error('Error details:', error.message);
+    }
+  } else {
+    console.log('Firebase Admin SDK already initialized. Skipping re-initialization.');
   }
 } else {
   console.warn('FIREBASE_SERVICE_ACCOUNT_BASE64 environment variable not set. Firebase Admin SDK will not be initialized.');
