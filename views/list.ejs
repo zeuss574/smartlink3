@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Smartlinks</title>
+    <title>link listing</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;700&display=swap" rel="stylesheet">
@@ -11,7 +11,7 @@
 </head>
 <body class="home-page">
     <div class="container">
-        <h1>All Smartlinks</h1>
+        <h1>all links</h1>
 
         <% if (allLinks && allLinks.length > 0) { %>
             <div class="links-container">
@@ -26,9 +26,9 @@
                 <% }); %>
             </div>
         <% } else { %>
-            <p>No smartlinks created yet.</p>
+            <p>no smartlinks created yet.</p>
         <% } %>
-        <a href="/" class="home-button">Create New Smartlink</a>
+        <a href="/" class="home-button">create a link</a>
     </div>
 </body>
 </html>
