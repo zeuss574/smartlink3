@@ -1,13 +1,12 @@
 const express = require('express');
 const fetch = require('node-fetch');
-const low = require('lowdb');
-const FileSync = require('lowdb/adapters/FileSync');
 
 const app = express();
 const port = 3000;
 
 // --- Firebase Admin SDK Setup ---
 const admin = require('firebase-admin');
+let db; // Declare db variable here
 
 // Check if the service account environment variable is set
 if (process.env.FIREBASE_SERVICE_ACCOUNT_BASE64) {
@@ -23,11 +22,8 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT_BASE64) {
       admin.initializeApp({
         credential: admin.credential.cert(serviceAccount)
       });
-      console.log('Firebase Admin SDK initialized successfully.');
-
-      // Example: Access Firestore (if you plan to use it)
-      // const db = admin.firestore();
-      // console.log('Firestore instance obtained.');
+      db = admin.firestore(); // Initialize Firestore
+      console.log('Firebase Admin SDK initialized successfully and Firestore instance obtained.');
 
     } catch (error) {
       console.error('Failed to initialize Firebase Admin SDK:', error);
@@ -35,15 +31,11 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT_BASE64) {
     }
   } else {
     console.log('Firebase Admin SDK already initialized. Skipping re-initialization.');
+    db = admin.firestore(); // Ensure db is set even if already initialized
   }
 } else {
   console.warn('FIREBASE_SERVICE_ACCOUNT_BASE64 environment variable not set. Firebase Admin SDK will not be initialized.');
 }
-
-// --- Database Setup ---
-const adapter = new FileSync('db.json');
-const db = low(adapter);
-db.defaults({ links: [] }).write();
 
 // --- Middleware ---
 app.set('view engine', 'ejs');
@@ -110,8 +102,13 @@ app.post('/create', async (req, res) => {
     const artistName = entity.artistName || 'Unknown Artist';
     const displayTitle = `${artistName} - ${releaseName}`;
 
-    // Save the new link to our database
-    db.get('links').push({ customPath, displayTitle, links, thumbnailUrl }).write();
+    // Save the new link to Firestore
+    await db.collection('links').doc(customPath).set({
+      customPath,
+      displayTitle,
+      links,
+      thumbnailUrl
+    });
 
     const successUrl = `https://${req.headers.host}/${customPath}`;
     res.render('index', { error: null, success: `Success! Your link is ready: ${successUrl}` });
@@ -174,26 +171,38 @@ const preferredOrder = [
   'tidal',
 ];
 
-app.get('/list', (req, res) => {
-  const allLinks = db.get('links').value();
-  res.render('list', { allLinks });
+app.get('/list', async (req, res) => {
+  try {
+    const snapshot = await db.collection('links').get();
+    const allLinks = snapshot.docs.map(doc => doc.data());
+    res.render('list', { allLinks });
+  } catch (error) {
+    console.error('Error fetching links from Firestore:', error);
+    res.render('list', { allLinks: [] }); // Render with empty array on error
+  }
 });
 
-app.get('/:customPath', (req, res) => {
+app.get('/:customPath', async (req, res) => {
   const { customPath } = req.params;
-  const linkData = db.get('links').find({ customPath }).value();
+  try {
+    const doc = await db.collection('links').doc(customPath).get();
 
-  if (linkData) {
-    res.render('link', {
-      title: linkData.displayTitle,
-      links: linkData.links,
-      thumbnailUrl: linkData.thumbnailUrl,
-      platformDisplayInfo: platformDisplayInfo,
-      formatPlatformName: formatPlatformName,
-      preferredOrder: preferredOrder
-    });
-  } else {
-    res.status(404).render('404');
+    if (doc.exists) {
+      const linkData = doc.data();
+      res.render('link', {
+        title: linkData.displayTitle,
+        links: linkData.links,
+        thumbnailUrl: linkData.thumbnailUrl,
+        platformDisplayInfo: platformDisplayInfo,
+        formatPlatformName: formatPlatformName,
+        preferredOrder: preferredOrder
+      });
+    } else {
+      res.status(404).render('404');
+    }
+  } catch (error) {
+    console.error('Error fetching single link from Firestore:', error);
+    res.status(500).render('404'); // Render 404 or an error page on database error
   }
 });
 
