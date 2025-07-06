@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" href="<%= thumbnailUrl %>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="background-blur" style="background-image: url('<%= thumbnailUrl %>');"></div>
+    <div class="container link-page">
+        <img src="<%= thumbnailUrl %>" alt="Album Art" class="album-art">
+        <h1><%= title %></h1>
+
+        <div class="links-container">
+            <% 
+                let allPlatformKeys = Object.keys(links);
+                allPlatformKeys.sort((a, b) => {
+                    const indexA = preferredOrder.indexOf(a);
+                    const indexB = preferredOrder.indexOf(b);
+                    if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+                    if (indexB !== -1) return 1;
+                    if (indexA !== -1) return -1;
+                    const displayNameA = platformDisplayInfo[a] ? platformDisplayInfo[a].displayName : formatPlatformName(a);
+                    const displayNameB = platformDisplayInfo[b] ? platformDisplayInfo[b].displayName : formatPlatformName(b);
+                    return displayNameA.localeCompare(displayNameB);
+                });
+
+                allPlatformKeys.forEach(platformKey => {
+                    const link = links[platformKey];
+                    const info = platformDisplayInfo[platformKey];
+                    const iconSlug = info ? info.iconSlug : platformKey.toLowerCase();
+                    const displayName = info ? info.displayName : formatPlatformName(platformKey);
+                %>
+                    <a href="<%= link.url %>" target="_blank" class="link-button">
+                        <div class="link-content">
+                            <% if (info && info.iconUrl) { %>
+                                <img src="<%= info.iconUrl %>" alt="<%= displayName %> logo" class="logo">
+                            <% } else if (platformKey === 'amazonStore') { %>
+                                <img src="https://services.linkfire.com/logo_amazon_onlight.svg" alt="<%= displayName %> logo" class="logo">
+                            <% } else if (platformKey === 'boomplay') { %>
+                                <img src="https://assets.ffm.to/images/logo/music-service_boomplay_updated.png" alt="<%= displayName %> logo" class="logo">
+                            <% } else { %>
+                                <img src="https://services.linkfire.com/logo_<%= iconSlug %>_onlight.svg" alt="<%= displayName %> logo" class="logo">
+                            <% } %>
+                            <span class="platform-name"><%= displayName %></span>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                <% }); %>
+        </div>
+    </div>
+</body>
+</html>

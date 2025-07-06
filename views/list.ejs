@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Smartlinks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="home-page">
+    <div class="container">
+        <h1>All Smartlinks</h1>
+
+        <% if (allLinks && allLinks.length > 0) { %>
+            <div class="links-container">
+                <% allLinks.forEach(link => { %>
+                    <a href="/<%= link.customPath %>" target="_blank" class="link-button">
+                        <div class="link-content">
+                            <img src="<%= link.thumbnailUrl %>" alt="Album Art" class="logo">
+                            <span class="platform-name"><%= link.displayTitle %></span>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                <% }); %>
+            </div>
+        <% } else { %>
+            <p>No smartlinks created yet.</p>
+        <% } %>
+        <a href="/" class="home-button">Create New Smartlink</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>create music smartlink</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="home-page">
+    <div class="container">
+        <h1>music smartlink creation</h1>
+        <p class="subtitle">create a simple music smartlink to share it everywhere</p>
+
+        <% if (error) { %>
+            <div class="message error"><%= error %></div>
+        <% } %>
+        <% if (success) { %>
+            <div class="message success">
+                <a href="<%= success.split(' ').pop() %>" target="_blank"><%= success %></a>
+            </div>
+        <% } %>
+
+        <form action="/create" method="POST">
+            <input type="url" name="musicUrl" placeholder="paste music URL (Spotify, Apple Music,...)" required>
+            <input type="text" name="title" placeholder="create a custom URL path" required pattern="[a-zA-Z0-9-_]+">
+            <button type="submit">create</button>
+        </form>
+    </div>
+</body>
+</html>
