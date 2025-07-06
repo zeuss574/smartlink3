@@ -786,6 +786,83 @@
         }
       },
       "thumbnailUrl": "https://i.scdn.co/image/ab67616d0000b273ddb5251616de6d2d0235f484"
+    },
+    {
+      "customPath": "what",
+      "displayTitle": "Hearts2Hearts - Butterflies",
+      "links": {
+        "amazonMusic": {
+          "country": "US",
+          "url": "https://music.amazon.com/albums/B0DX7J4G2W?trackAsin=B0DX7JKXM2",
+          "entityUniqueId": "AMAZON_SONG::B0DX7JKXM2"
+        },
+        "amazonStore": {
+          "country": "US",
+          "url": "https://amazon.com/dp/B0DX7JKXM2",
+          "entityUniqueId": "AMAZON_SONG::B0DX7JKXM2"
+        },
+        "audiomack": {
+          "country": "US",
+          "url": "https://audiomack.com/song/lee_hesseungo/screenrecording-03-08-2025-22-42-47-1",
+          "entityUniqueId": "AUDIOMACK_SONG::62262813"
+        },
+        "anghami": {
+          "country": "US",
+          "url": "https://play.anghami.com/song/1199790927?refer=linktree",
+          "entityUniqueId": "ANGHAMI_SONG::1199790927"
+        },
+        "deezer": {
+          "country": "US",
+          "url": "https://www.deezer.com/track/3234208291",
+          "entityUniqueId": "DEEZER_SONG::3234208291"
+        },
+        "appleMusic": {
+          "country": "US",
+          "url": "https://geo.music.apple.com/us/album/_/1796402197?i=1796402203&mt=1&app=music&ls=1&at=1000lHKX&ct=api_http&itscg=30200&itsct=odsl_m",
+          "nativeAppUriMobile": "music://itunes.apple.com/us/album/_/1796402197?i=1796402203&mt=1&app=music&ls=1&at=1000lHKX&ct=api_uri_m&itscg=30200&itsct=odsl_m",
+          "nativeAppUriDesktop": "itmss://itunes.apple.com/us/album/_/1796402197?i=1796402203&mt=1&app=music&ls=1&at=1000lHKX&ct=api_uri_d&itscg=30200&itsct=odsl_m",
+          "entityUniqueId": "ITUNES_SONG::1796402203"
+        },
+        "itunes": {
+          "country": "US",
+          "url": "https://geo.music.apple.com/us/album/_/1796402197?i=1796402203&mt=1&app=itunes&ls=1&at=1000lHKX&ct=api_http&itscg=30200&itsct=odsl_m",
+          "nativeAppUriMobile": "itmss://itunes.apple.com/us/album/_/1796402197?i=1796402203&mt=1&app=itunes&ls=1&at=1000lHKX&ct=api_uri_m&itscg=30200&itsct=odsl_m",
+          "nativeAppUriDesktop": "itmss://itunes.apple.com/us/album/_/1796402197?i=1796402203&mt=1&app=itunes&ls=1&at=1000lHKX&ct=api_uri_d&itscg=30200&itsct=odsl_m",
+          "entityUniqueId": "ITUNES_SONG::1796402203"
+        },
+        "pandora": {
+          "country": "US",
+          "url": "https://www.pandora.com/TR:151194522",
+          "entityUniqueId": "PANDORA_SONG::TR:151194522"
+        },
+        "soundcloud": {
+          "country": "US",
+          "url": "https://soundcloud.com/primaveric/butterflies-hearts2hearts-full",
+          "entityUniqueId": "SOUNDCLOUD_SONG::2041536132"
+        },
+        "tidal": {
+          "country": "US",
+          "url": "https://listen.tidal.com/track/417994896",
+          "entityUniqueId": "TIDAL_SONG::417994896"
+        },
+        "youtube": {
+          "country": "US",
+          "url": "https://www.youtube.com/watch?v=4xkPyVSKu1U",
+          "entityUniqueId": "YOUTUBE_VIDEO::4xkPyVSKu1U"
+        },
+        "youtubeMusic": {
+          "country": "US",
+          "url": "https://music.youtube.com/watch?v=4xkPyVSKu1U",
+          "entityUniqueId": "YOUTUBE_VIDEO::4xkPyVSKu1U"
+        },
+        "spotify": {
+          "country": "US",
+          "url": "https://open.spotify.com/track/3s3Eo4rb6aq3O62g6z6jtZ",
+          "nativeAppUriDesktop": "spotify:track:3s3Eo4rb6aq3O62g6z6jtZ",
+          "entityUniqueId": "SPOTIFY_SONG::3s3Eo4rb6aq3O62g6z6jtZ"
+        }
+      },
+      "thumbnailUrl": "https://i.scdn.co/image/ab67616d0000b273d346fc1102eb417305b5358b"
     }
   ]
 }

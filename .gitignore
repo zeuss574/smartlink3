@@ -1,2 +1,11 @@
-.env\"db.json\"  
-\"smartlink3-e2fc4-firebase-adminsdk-fbsvc-7fd3770046.json\" 
+# Dependencies
+/node_modules
+
+# Environment variables
+.env
+
+# Local database
+db.json
+
+# Firebase Admin SDK key file (if stored locally, though environment variable is preferred)
+smartlink3-e2fc4-firebase-adminsdk-fbsvc-7fd3770046.json

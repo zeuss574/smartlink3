@@ -6,6 +6,32 @@ const FileSync = require('lowdb/adapters/FileSync');
 const app = express();
 const port = 3000;
 
+// --- Firebase Admin SDK Setup ---
+const admin = require('firebase-admin');
+
+// Check if the service account environment variable is set
+if (process.env.FIREBASE_SERVICE_ACCOUNT_BASE64) {
+  try {
+    // Decode the Base64 string and parse it as JSON
+    const serviceAccount = JSON.parse(Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_BASE64, 'base64').toString('utf8'));
+
+    // Initialize Firebase Admin SDK
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount)
+    });
+    console.log('Firebase Admin SDK initialized successfully.');
+
+    // Example: Access Firestore (if you plan to use it)
+    // const db = admin.firestore();
+    // console.log('Firestore instance obtained.');
+
+  } catch (error) {
+    console.error('Failed to initialize Firebase Admin SDK:', error);
+  }
+} else {
+  console.warn('FIREBASE_SERVICE_ACCOUNT_BASE64 environment variable not set. Firebase Admin SDK will not be initialized.');
+}
+
 // --- Database Setup ---
 const adapter = new FileSync('db.json');
 const db = low(adapter);
