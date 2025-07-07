@@ -109,12 +109,39 @@ app.post('/create', async (req, res) => {
     const artistName = entity.artistName || 'Unknown Artist';
     const displayTitle = `${artistName} - ${releaseName}`;
 
+    // Get creation date and time
+    const now = new Date();
+    const creationDate = `${now.toLocaleDateString('en-GB')} - ${now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`;
+
+    // Get IP and location info
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    let locationInfo = {};
+    try {
+        const ipApiResponse = await fetch(`http://ip-api.com/json/${ip}`);
+        const ipApiData = await ipApiResponse.json();
+        if (ipApiData.status === 'success') {
+            locationInfo = {
+                country: ipApiData.country,
+                isp: ipApiData.isp,
+            };
+        }
+    } catch (error) {
+        console.error('Error fetching IP geolocation data:', error);
+    }
+
+    // Get device info
+    const deviceInfo = req.headers['user-agent'];
+
     // Save the new link to Firestore
     await db.collection('links').doc(customPath).set({
       customPath,
       displayTitle,
       links,
-      thumbnailUrl
+      thumbnailUrl,
+      creationDate,
+      deviceInfo,
+      ip,
+      locationInfo
     });
 
     const successUrl = `https://${req.headers.host}/${customPath}`;

@@ -14,17 +14,24 @@
         <h1>all links</h1>
 
         <% if (allLinks && allLinks.length > 0) { %>
-            <div class="links-container">
-                <% allLinks.forEach(link => { %>
-                    <a href="/<%= link.customPath %>" target="_blank" class="link-button">
-                        <div class="link-content">
-                            <img src="<%= link.thumbnailUrl %>" alt="Album Art" class="logo">
-                            <span class="platform-name"><%= link.displayTitle %></span>
-                        </div>
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                <% }); %>
-            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Artwork</th>
+                        <th>Title</th>
+                        <th>Creation Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% allLinks.forEach(link => { %>
+                        <tr>
+                            <td><img src="<%= link.thumbnailUrl %>" alt="Artwork" class="artwork-img"></td>
+                            <td><a href="/<%= link.customPath %>" target="_blank"><%= link.displayTitle %></a></td>
+                            <td><%= link.creationDate %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
         <% } else { %>
             <p>no smartlinks created yet.</p>
         <% } %>
