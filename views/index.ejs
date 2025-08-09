@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/style.css">
+    <script src="https://www.google.com/recaptcha/api.js?render=<%= siteKey %>"></script>
 </head>
 <body class="home-page">
     <div class="container">
@@ -24,10 +25,22 @@
         <% } %>
 
         <form action="/create" method="POST">
+            <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
             <input type="url" name="musicUrl" placeholder="paste music URL (Spotify, Apple Music,...)" required>
             <input type="text" name="title" placeholder="create a custom URL path" required pattern="[a-zA-Z0-9-_]+">
             <button type="submit">create</button>
         </form>
     </div>
+    <script>
+      document.querySelector('form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        grecaptcha.ready(function() {
+          grecaptcha.execute('<%= siteKey %>', {action: 'submit'}).then(function(token) {
+            document.getElementById('g-recaptcha-response').value = token;
+            document.querySelector('form').submit();
+          });
+        });
+      });
+    </script>
 </body>
 </html>

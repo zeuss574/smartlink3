@@ -51,18 +51,47 @@ app.use(express.urlencoded({ extended: true }));
 
 // Homepage to create links
 app.get('/', (req, res) => {
-  res.render('index', { error: null, success: null });
+  res.render('index', {
+    error: null,
+    success: null,
+    siteKey: process.env.RECAPTCHA_SITE_KEY
+  });
 });
 
 // Create a new smartlink
 app.post('/create', async (req, res) => {
-  const { musicUrl, title: customPath } = req.body; // Rename title to customPath
+  const { musicUrl, title: customPath, 'g-recaptcha-response': token } = req.body; // Rename title to customPath
+
+  // reCAPTCHA verification
+  const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+  const verificationURL = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${token}`;
+
+  try {
+    const recaptchaRes = await fetch(verificationURL, { method: 'POST' });
+    const recaptchaData = await recaptchaRes.json();
+
+    if (!recaptchaData.success || recaptchaData.score < 0.5) {
+      return res.render('index', {
+        error: 'reCAPTCHA verification failed. Please try again.',
+        success: null,
+        siteKey: process.env.RECAPTCHA_SITE_KEY
+      });
+    }
+  } catch (error) {
+    console.error('reCAPTCHA verification error:', error);
+    return res.render('index', {
+      error: 'An error occurred during reCAPTCHA verification.',
+      success: null,
+      siteKey: process.env.RECAPTCHA_SITE_KEY
+    });
+  }
 
   // Basic validation for the custom path
   if (!customPath || !/^[a-zA-Z0-9-_]+$/.test(customPath)) {
     return res.render('index', {
       error: 'Custom path can only contain letters, numbers, hyphens (-), and underscores (_).',
-      success: null
+      success: null,
+      siteKey: process.env.RECAPTCHA_SITE_KEY
     });
   }
 
@@ -70,7 +99,7 @@ app.post('/create', async (req, res) => {
   const docRef = db.collection('links').doc(customPath);
   const doc = await docRef.get();
   if (doc.exists) {
-    return res.render('index', { error: 'This custom path is already taken.', success: null });
+    return res.render('index', { error: 'This custom path is already taken.', success: null, siteKey: process.env.RECAPTCHA_SITE_KEY });
   }
 
   try {
@@ -84,7 +113,7 @@ app.post('/create', async (req, res) => {
 
     // Ensure the API returned the necessary data
     if (!data.linksByPlatform || !data.entitiesByUniqueId || !data.entityUniqueId) {
-      return res.render('index', { error: 'Could not find music data for this URL. Please check the link and try again.', success: null });
+      return res.render('index', { error: 'Could not find music data for this URL. Please check the link and try again.', success: null, siteKey: process.env.RECAPTCHA_SITE_KEY });
     }
 
     const links = data.linksByPlatform;
@@ -111,7 +140,7 @@ app.post('/create', async (req, res) => {
 
     // Get creation date and time
     const now = new Date();
-    const creationDate = `${now.toLocaleDateString('en-GB')} - ${now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`;
+    const creationDate = `${now.toLocaleDateString('en-VN')} - ${now.toLocaleTimeString('en-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
 
     // Get IP and location info
     const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -145,11 +174,11 @@ app.post('/create', async (req, res) => {
     });
 
     const successUrl = `https://${req.headers.host}/${customPath}`;
-    res.render('index', { error: null, success: `Success! Your link is ready: ${successUrl}` });
+    res.render('index', { error: null, success: `Success! Your link is ready: ${successUrl}`, siteKey: process.env.RECAPTCHA_SITE_KEY });
 
   } catch (error) {
     console.error(error);
-    res.render('index', { error: 'An unexpected error occurred while creating the link.', success: null });
+    res.render('index', { error: 'An unexpected error occurred while creating the link.', success: null, siteKey: process.env.RECAPTCHA_SITE_KEY });
   }
 });
 
