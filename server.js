@@ -140,7 +140,7 @@ app.post('/create', async (req, res) => {
 
     // Get creation date and time
     const now = new Date();
-    const creationDate = `${now.toLocaleDateString('en-VN')} - ${now.toLocaleTimeString('en-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+    const creationDate = `${now.toLocaleDateString('en-VN', { timeZone: 'Asia/Ho_Chi_Minh' })} - ${now.toLocaleTimeString('en-VN', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
 
     // Get IP and location info
     const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
