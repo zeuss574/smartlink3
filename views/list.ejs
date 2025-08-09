@@ -18,8 +18,22 @@
                 <thead>
                     <tr>
                         <th>Artwork</th>
-                        <th>Title</th>
-                        <th>Creation Date</th>
+                        <th>
+                            <a href="/list?sortBy=displayTitle&order=<%= (sortBy === 'displayTitle' && order === 'asc') ? 'desc' : 'asc' %>">
+                                Title
+                                <% if (sortBy === 'displayTitle') { %>
+                                    <%- order === 'asc' ? '&#9650;' : '&#9660;' %>
+                                <% } %>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="/list?sortBy=creationDate&order=<%= (sortBy === 'creationDate' && order === 'asc') ? 'desc' : 'asc' %>">
+                                Creation Date
+                                <% if (sortBy === 'creationDate') { %>
+                                    <%- order === 'asc' ? '&#9650;' : '&#9660;' %>
+                                <% } %>
+                            </a>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -27,7 +41,28 @@
                         <tr>
                             <td><img src="<%= link.thumbnailUrl %>" alt="Artwork" class="artwork-img"></td>
                             <td><a href="/<%= link.customPath %>" target="_blank"><%= link.displayTitle %></a></td>
-                            <td><%= link.creationDate %></td>
+                            <td>
+                                <%
+                                    let displayDate = 'N/A'; // Default value
+                                    if (link.creationDate) {
+                                        let datePart = link.creationDate.split(' - ')[0];
+                                        if (datePart.includes('-')) { // New YYYY-MM-DD format
+                                            const parts = datePart.split('-');
+                                            displayDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                                        } else if (datePart.includes('/')) { // Old M/D/YYYY format
+                                            const parts = datePart.split('/');
+                                            if (parts.length === 3) {
+                                                displayDate = `${parts[1].padStart(2, '0')}/${parts[0].padStart(2, '0')}/${parts[2]}`;
+                                            } else {
+                                                displayDate = datePart; // Fallback
+                                            }
+                                        } else {
+                                            displayDate = datePart; // Fallback
+                                        }
+                                    }
+                                %>
+                                <%= displayDate %>
+                            </td>
                         </tr>
                     <% }); %>
                 </tbody>

@@ -140,7 +140,10 @@ app.post('/create', async (req, res) => {
 
     // Get creation date and time
     const now = new Date();
-    const creationDate = `${now.toLocaleDateString('en-VN', { timeZone: 'Asia/Ho_Chi_Minh' })} - ${now.toLocaleTimeString('en-VN', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const creationDate = `${year}-${month}-${day} - ${now.toLocaleTimeString('en-GB', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
 
     // Get IP and location info
     const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -237,11 +240,46 @@ const preferredOrder = [
 app.get('/list', async (req, res) => {
   try {
     const snapshot = await db.collection('links').get();
-    const allLinks = snapshot.docs.map(doc => doc.data());
-    res.render('list', { allLinks });
+    let allLinks = snapshot.docs.map(doc => doc.data());
+    const { sortBy = 'creationDate', order = 'desc' } = req.query;
+
+    allLinks.sort((a, b) => {
+      let valA = a[sortBy];
+      let valB = b[sortBy];
+
+      // Handle old date format for sorting
+      const reformatDate = (dateStr) => {
+        if (!dateStr) return '';
+        // Only handle YYYY-MM-DD format
+        if (dateStr.includes('-')) {
+          return dateStr.split(' - ')[0];
+        }
+        // Return original string for old formats
+        return dateStr;
+      };
+
+      if (sortBy === 'creationDate') {
+        valA = reformatDate(valA);
+        valB = reformatDate(valB);
+      }
+
+      if (valA < valB) {
+        return order === 'asc' ? -1 : 1;
+      }
+      if (valA > valB) {
+        return order === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+
+    res.render('list', { 
+      allLinks,
+      sortBy,
+      order
+    });
   } catch (error) {
     console.error('Error fetching links from Firestore:', error);
-    res.render('list', { allLinks: [] }); // Render with empty array on error
+    res.render('list', { allLinks: [], sortBy: 'creationDate', order: 'desc' }); // Render with empty array on error
   }
 });
 
