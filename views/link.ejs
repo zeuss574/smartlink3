@@ -12,134 +12,130 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Google Fonts (Inter) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="icon" href="<%= thumbnailUrl %>">
 
+    <!-- Theme Color for Browser Chrome -->
+    <meta name="theme-color" content="#141414">
+
     <style>
         :root {
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --glass-surface: rgba(20, 20, 20, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-surface: rgba(20, 20, 20, 0.75);
+        }
+
+        html {
+            /* Remove scroll locking */
+            overscroll-behavior-y: auto; 
+            min-height: 100%;
+            /* IMPORTANT: Transparent so overscroll reveals fixed bg */
+            background-color: transparent; 
         }
 
         body { 
             font-family: 'Inter', sans-serif; 
-            background: #000;
+            /* IMPORTANT: Transparent background ensures seamless bounce */
+            background-color: transparent; 
             -webkit-font-smoothing: antialiased;
-            overflow-y: auto;
             overflow-x: hidden;
+            min-height: 100vh;
+            color: white;
         }
 
-        /* --- VisionOS Style Glass --- */
+        /* Optimized Glass */
         .ios-glass {
             background: var(--glass-surface);
-            backdrop-filter: blur(50px) saturate(180%);
-            -webkit-backdrop-filter: blur(50px) saturate(180%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
-            box-shadow: 
-                0 20px 40px rgba(0, 0, 0, 0.4),
-                inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transform: translateZ(0);
         }
 
-        /* Floating Glass Button */
+        /* Optimized List Button */
         .glass-button {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.2s ease, background 0.2s ease;
             position: relative;
-            overflow: hidden;
         }
         
         .glass-button:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.3);
-            transform: scale(1.02);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.01);
         }
 
         .glass-button:active {
-            transform: scale(0.98);
+            transform: scale(0.99);
         }
 
-        /* Fade In Animation */
+        /* Fade In */
         .fade-in-up {
-            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             opacity: 0;
-            transform: translateY(40px);
+            transform: translateY(20px);
+            will-change: transform, opacity;
         }
         
         @keyframes fadeInUp {
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Background Breath Animation */
-        .bg-breath { animation: breath 20s ease-in-out infinite alternate; }
-        @keyframes breath {
-            0% { transform: scale(1.1); opacity: 0.4; }
-            100% { transform: scale(1.3); opacity: 0.6; }
+        /* Static Background Blur */
+        .bg-static-blur {
+            filter: blur(60px);
+            transform: translateZ(0);
         }
 
-        /* Scrollbar Styling */
-        .service-list::-webkit-scrollbar { width: 4px; }
-        .service-list::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
-        .service-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-        
-        /* Modal Content Scrollbar */
+        /* Scrollbar aesthetics */
         .legal-content::-webkit-scrollbar { width: 4px; }
         .legal-content::-webkit-scrollbar-track { background: transparent; }
         .legal-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 10px; }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center selection:bg-white/20 py-10">
+<body class="flex flex-col items-center justify-center py-12">
 
-    <!-- Dynamic Background Layers -->
-    <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <div class="absolute inset-0 bg-[#050505]"></div>
-        <!-- Aura -->
-        <div class="absolute inset-0 bg-cover bg-center bg-no-repeat blur-[100px] bg-breath"
+    <!-- Background Layer (Fixed & Behind Everything) -->
+    <!-- z-index: -1 ensures it stays put while body bounces over it -->
+    <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-black">
+        <!-- Static Blurred Background -->
+        <div class="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 bg-static-blur"
              style="background-image: url('<%= thumbnailUrl %>');">
         </div>
-        <!-- Noise -->
-        <div class="absolute inset-0 opacity-[0.03]" style="background-image: url('https://grainy-gradients.vercel.app/noise.svg');"></div>
-        <!-- Vignette -->
-        <div class="absolute inset-0 bg-radial-gradient(circle at center, transparent 0%, #000 100%) opacity-60"></div>
+        <!-- Gradient overlay -->
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black/80"></div>
     </div>
 
     <!-- Floating Cookie Orb -->
-    <button onclick="toggleModal('cookie-modal')" class="fixed bottom-8 left-8 z-40 w-12 h-12 ios-glass rounded-full flex items-center justify-center text-white/80 hover:text-white transition-all hover:scale-110 group shadow-[0_0_20px_rgba(255,255,255,0.1)] cursor-pointer" aria-label="Legal & Cookies">
-        <i class="fas fa-cookie text-lg group-hover:rotate-12 transition-transform duration-500"></i>
+    <button onclick="toggleModal('cookie-modal')" class="fixed bottom-6 left-6 z-40 w-12 h-12 ios-glass rounded-full flex items-center justify-center text-white/80 hover:text-white transition-transform active:scale-95 cursor-pointer shadow-lg" aria-label="Legal & Cookies">
+        <i class="fas fa-cookie text-lg"></i>
     </button>
 
     <!-- Main Card -->
     <main class="relative z-10 w-full max-w-[400px] mx-auto px-4 fade-in-up">
         
-        <div class="ios-glass rounded-[36px] flex flex-col overflow-hidden relative">
-            <!-- Glass Sheen -->
-            <div class="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none"></div>
-
+        <div class="ios-glass rounded-[32px] flex flex-col overflow-hidden relative">
+            
             <!-- Header Section -->
             <div class="pt-10 pb-6 flex flex-col items-center text-center relative z-10">
                 <!-- Album Art -->
-                <div class="relative w-52 h-52 mb-8 group perspective-1000">
-                    <div class="absolute -bottom-4 inset-x-4 h-4 bg-black/40 blur-xl rounded-full transition-all group-hover:scale-90"></div>
+                <div class="relative w-48 h-48 mb-6">
                     <img src="<%= thumbnailUrl %>" 
                          alt="Album Art" 
-                         class="w-full h-full object-cover rounded-[20px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 transition-transform duration-700 ease-out group-hover:transform group-hover:rotate-y-12 group-hover:-translate-y-2">
-                    <!-- Play icon overlay -->
-                    <div class="absolute bottom-4 right-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-lg">
-                        <i class="fas fa-music text-white/90 text-[10px]"></i>
-                    </div>
+                         class="w-full h-full object-cover rounded-[16px] shadow-2xl border border-white/10"
+                         loading="eager">
                 </div>
 
                 <!-- Title Info -->
                 <div class="px-6">
-                    <h1 class="text-2xl font-bold text-white mb-1.5 tracking-tight drop-shadow-md"><%= title %></h1>
-                    <p class="text-sm text-white/60 font-medium tracking-wide uppercase">Choose Music Service</p>
+                    <h1 class="text-2xl font-bold text-white mb-1 tracking-tight"><%= title %></h1>
+                    <p class="text-sm text-white/60 font-medium tracking-wide uppercase">Choose Service</p>
                 </div>
             </div>
 
             <!-- Service List Container -->
-            <div class="px-4 pb-6 space-y-2.5 service-list max-h-[50vh] overflow-y-auto relative z-10">
+            <div class="px-4 pb-6 space-y-3 relative z-10">
                 <% 
                 let allPlatformKeys = Object.keys(links);
                 allPlatformKeys.sort((a, b) => {
@@ -159,25 +155,25 @@
                     const iconSlug = info ? info.iconSlug : platformKey.toLowerCase();
                     const displayName = info ? info.displayName : formatPlatformName(platformKey);
                 %>
-                    <a href="<%= link.url %>" target="_blank" class="glass-button rounded-[18px] flex items-center justify-between p-3 group">
-                        <div class="flex items-center gap-4">
+                    <a href="<%= link.url %>" target="_blank" class="glass-button rounded-[16px] flex items-center justify-between p-3.5 group">
+                        <div class="flex items-center gap-4 min-w-0">
                             <!-- Logo Container -->
-                            <div class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 shadow-inner backdrop-blur-sm shrink-0">
+                            <div class="w-9 h-9 flex items-center justify-center rounded-full bg-white/10 shrink-0">
                                 <% if (info && info.iconUrl) { %>
-                                    <img src="<%= info.iconUrl %>" alt="<%= displayName %>" class="w-5 h-5 object-contain filter drop-shadow">
+                                    <img src="<%= info.iconUrl %>" alt="<%= displayName %>" class="w-5 h-5 object-contain" loading="lazy">
                                 <% } else if (platformKey === 'amazonStore') { %>
-                                    <img src="https://services.linkfire.com/logo_amazon_onlight.svg" alt="Amazon" class="w-5 h-5 object-contain">
+                                    <img src="https://services.linkfire.com/logo_amazon_onlight.svg" alt="Amazon" class="w-5 h-5 object-contain" loading="lazy">
                                 <% } else if (platformKey === 'boomplay') { %>
-                                    <img src="https://assets.ffm.to/images/logo/music-service_boomplay_updated.png" alt="Boomplay" class="w-5 h-5 object-contain">
+                                    <img src="https://assets.ffm.to/images/logo/music-service_boomplay_updated.png" alt="Boomplay" class="w-5 h-5 object-contain" loading="lazy">
                                 <% } else { %>
-                                    <img src="https://services.linkfire.com/logo_<%= iconSlug %>_onlight.svg" onerror="this.style.display='none'" alt="<%= displayName %>" class="w-5 h-5 object-contain">
+                                    <img src="https://services.linkfire.com/logo_<%= iconSlug %>_onlight.svg" onerror="this.style.display='none'" alt="<%= displayName %>" class="w-5 h-5 object-contain" loading="lazy">
                                 <% } %>
                             </div>
-                            <span class="font-semibold text-white/90 text-[15px] tracking-wide group-hover:text-white transition-colors truncate"><%= displayName %></span>
+                            <span class="font-semibold text-white/90 text-[15px] truncate"><%= displayName %></span>
                         </div>
                         
                         <!-- Arrow -->
-                        <div class="w-8 h-8 flex items-center justify-center text-white/30 group-hover:text-white group-hover:translate-x-1 transition-all duration-300 shrink-0">
+                        <div class="w-8 h-8 flex items-center justify-center text-white/40 shrink-0">
                             <i class="fas fa-chevron-right text-sm"></i>
                         </div>
                     </a>
@@ -187,105 +183,73 @@
     </main>
 
     <!-- Cookie Modal -->
-    <div id="cookie-modal" class="fixed inset-0 z-50 flex items-center justify-center px-4 opacity-0 pointer-events-none transition-all duration-500">
-        <div class="absolute inset-0 bg-[#000000]/60 backdrop-blur-md" onclick="toggleModal('cookie-modal')"></div>
-        
-        <div class="ios-glass p-8 rounded-[32px] max-w-xs w-full relative z-10 transform scale-90 translate-y-4 transition-all duration-500 modal-content">
+    <div id="cookie-modal" class="fixed inset-0 z-50 flex items-center justify-center px-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="toggleModal('cookie-modal')"></div>
+        <div class="ios-glass p-8 rounded-[24px] max-w-xs w-full relative z-10 transform scale-95 translate-y-4 transition-transform duration-300 modal-content bg-[#111]">
             <div class="text-center">
-                <div class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-5 text-white shadow-[0_0_30px_rgba(255,255,255,0.2)]">
-                    <i class="fas fa-cookie text-2xl"></i>
+                <div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-5 text-white">
+                    <i class="fas fa-cookie text-xl"></i>
                 </div>
-                <h3 class="text-xl font-semibold text-white mb-3 tracking-tight">Privacy & Data</h3>
-                <p class="text-sm text-white/60 mb-8 leading-relaxed">
+                <h3 class="text-lg font-bold text-white mb-2">Privacy & Data</h3>
+                <p class="text-sm text-white/60 mb-6 leading-relaxed">
                     We use cookies to ensure the best experience. By continuing, you agree to our standard terms.
                 </p>
-                
-                <button onclick="toggleModal('cookie-modal')" class="w-full py-3.5 px-6 bg-white text-black font-semibold text-sm rounded-full hover:bg-white/90 hover:scale-[1.02] active:scale-95 transition-all shadow-lg mb-6">
+                <button onclick="toggleModal('cookie-modal')" class="w-full py-3 px-6 bg-white text-black font-bold text-sm rounded-full hover:bg-gray-200 transition-colors mb-4">
                     Accept All
                 </button>
-
                 <div class="flex justify-center gap-4 text-[11px] text-white/40 font-medium uppercase tracking-widest">
-                    <button onclick="switchModal('cookie-modal', 'privacy-modal')" class="hover:text-white transition-colors cursor-pointer">Privacy</button>
+                    <button onclick="switchModal('cookie-modal', 'privacy-modal')" class="hover:text-white transition-colors">Privacy</button>
                     <span>•</span>
-                    <button onclick="switchModal('cookie-modal', 'terms-modal')" class="hover:text-white transition-colors cursor-pointer">Terms</button>
+                    <button onclick="switchModal('cookie-modal', 'terms-modal')" class="hover:text-white transition-colors">Terms</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Generic Legal Modal Structure (Privacy) -->
-    <div id="privacy-modal" class="fixed inset-0 z-[60] flex items-center justify-center px-4 opacity-0 pointer-events-none transition-all duration-500">
-        <div class="absolute inset-0 bg-[#000000]/60 backdrop-blur-md" onclick="toggleModal('privacy-modal')"></div>
-        
-        <div class="ios-glass p-6 rounded-[32px] max-w-md w-full relative z-10 transform scale-90 translate-y-4 transition-all duration-500 flex flex-col max-h-[80vh] modal-content">
+    <!-- Privacy Modal -->
+    <div id="privacy-modal" class="fixed inset-0 z-[60] flex items-center justify-center px-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="toggleModal('privacy-modal')"></div>
+        <div class="ios-glass p-6 rounded-[24px] max-w-md w-full relative z-10 transform scale-95 translate-y-4 transition-transform duration-300 flex flex-col max-h-[80vh] modal-content bg-[#111]">
             <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-4">
-                <h3 class="text-xl font-semibold text-white">Privacy Policy</h3>
-                <button onclick="toggleModal('privacy-modal')" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+                <h3 class="text-lg font-bold text-white">Privacy Policy</h3>
+                <button onclick="toggleModal('privacy-modal')" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20">
                     <i class="fas fa-times text-white text-sm"></i>
                 </button>
             </div>
-            
             <div class="legal-content overflow-y-auto text-left space-y-4 text-white/70 text-sm pr-2">
                 <p><strong>Last updated: October 2024</strong></p>
-                <p>This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information when You use the Service and tells You about Your privacy rights and how the law protects You.</p>
-                
-                <h4 class="text-white font-semibold mt-4">1. Collecting and Using Your Personal Data</h4>
-                <p>While using Our Service, We may ask You to provide Us with certain personally identifiable information that can be used to contact or identify You. Personally identifiable information may include, but is not limited to: Usage Data.</p>
-                
-                <h4 class="text-white font-semibold mt-4">2. Usage Data</h4>
-                <p>Usage Data is collected automatically when using the Service. Usage Data may include information such as Your Device's Internet Protocol address (e.g. IP address), browser type, browser version, the pages of our Service that You visit, the time and date of Your visit, the time spent on those pages, unique device identifiers and other diagnostic data.</p>
-                
-                <h4 class="text-white font-semibold mt-4">3. Tracking Technologies and Cookies</h4>
-                <p>We use Cookies and similar tracking technologies to track the activity on Our Service and store certain information. Tracking technologies used are beacons, tags, and scripts to collect and track information and to improve and analyze Our Service.</p>
-                
-                <h4 class="text-white font-semibold mt-4">4. Security of Your Personal Data</h4>
-                <p>The security of Your Personal Data is important to Us, but remember that no method of transmission over the Internet, or method of electronic storage is 100% secure. While We strive to use commercially acceptable means to protect Your Personal Data, We cannot guarantee its absolute security.</p>
+                <p>This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information.</p>
+                <h4 class="text-white font-semibold mt-4">1. Data Collection</h4>
+                <p>We collect Usage Data automatically when using the Service. This may include IP addresses and browser types.</p>
+                <h4 class="text-white font-semibold mt-4">2. Cookies</h4>
+                <p>We use Cookies to track activity on Our Service and store certain information to improve functionality.</p>
             </div>
-            
             <div class="mt-6 pt-4 border-t border-white/10 text-center">
-                <button onclick="switchModal('privacy-modal', 'cookie-modal')" class="text-xs text-white/50 hover:text-white uppercase tracking-wider">
-                    <i class="fas fa-arrow-left mr-1"></i> Back
-                </button>
+                <button onclick="switchModal('privacy-modal', 'cookie-modal')" class="text-xs text-white/50 hover:text-white uppercase tracking-wider">Back</button>
             </div>
         </div>
     </div>
 
-    <!-- Generic Legal Modal Structure (Terms) -->
-    <div id="terms-modal" class="fixed inset-0 z-[60] flex items-center justify-center px-4 opacity-0 pointer-events-none transition-all duration-500">
-        <div class="absolute inset-0 bg-[#000000]/60 backdrop-blur-md" onclick="toggleModal('terms-modal')"></div>
-        
-        <div class="ios-glass p-6 rounded-[32px] max-w-md w-full relative z-10 transform scale-90 translate-y-4 transition-all duration-500 flex flex-col max-h-[80vh] modal-content">
+    <!-- Terms Modal -->
+    <div id="terms-modal" class="fixed inset-0 z-[60] flex items-center justify-center px-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="toggleModal('terms-modal')"></div>
+        <div class="ios-glass p-6 rounded-[24px] max-w-md w-full relative z-10 transform scale-95 translate-y-4 transition-transform duration-300 flex flex-col max-h-[80vh] modal-content bg-[#111]">
             <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-4">
-                <h3 class="text-xl font-semibold text-white">Terms of Service</h3>
-                <button onclick="toggleModal('terms-modal')" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+                <h3 class="text-lg font-bold text-white">Terms of Service</h3>
+                <button onclick="toggleModal('terms-modal')" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20">
                     <i class="fas fa-times text-white text-sm"></i>
                 </button>
             </div>
-            
             <div class="legal-content overflow-y-auto text-left space-y-4 text-white/70 text-sm pr-2">
                 <p><strong>Last updated: October 2024</strong></p>
                 <p>Please read these terms and conditions carefully before using Our Service.</p>
-                
-                <h4 class="text-white font-semibold mt-4">1. Interpretation and Definitions</h4>
-                <p>The words of which the initial letter is capitalized have meanings defined under the following conditions. The following definitions shall have the same meaning regardless of whether they appear in singular or in plural.</p>
-                
-                <h4 class="text-white font-semibold mt-4">2. Acknowledgment</h4>
-                <p>These are the Terms and Conditions governing the use of this Service and the agreement that operates between You and the Company. These Terms and Conditions set out the rights and obligations of all users regarding the use of the Service.</p>
-                
-                <h4 class="text-white font-semibold mt-4">3. Links to Other Websites</h4>
-                <p>Our Service may contain links to third-party web sites or services that are not owned or controlled by the Company. The Company has no control over, and assumes no responsibility for, the content, privacy policies, or practices of any third party web sites or services.</p>
-                
-                <h4 class="text-white font-semibold mt-4">4. Termination</h4>
-                <p>We may terminate or suspend Your access immediately, without prior notice or liability, for any reason whatsoever, including without limitation if You breach these Terms and Conditions.</p>
-
-                <h4 class="text-white font-semibold mt-4">5. "AS IS" and "AS AVAILABLE" Disclaimer</h4>
-                <p>The Service is provided to You "AS IS" and "AS AVAILABLE" and with all faults and defects without warranty of any kind. To the maximum extent permitted under applicable law, the Company expressly disclaims all warranties, whether express, implied, statutory or otherwise.</p>
+                <h4 class="text-white font-semibold mt-4">1. Agreement</h4>
+                <p>These Terms govern the use of this Service and the agreement between You and the Company.</p>
+                <h4 class="text-white font-semibold mt-4">2. Disclaimer</h4>
+                <p>The Service is provided "AS IS" without warranty of any kind.</p>
             </div>
-            
             <div class="mt-6 pt-4 border-t border-white/10 text-center">
-                <button onclick="switchModal('terms-modal', 'cookie-modal')" class="text-xs text-white/50 hover:text-white uppercase tracking-wider">
-                    <i class="fas fa-arrow-left mr-1"></i> Back
-                </button>
+                <button onclick="switchModal('terms-modal', 'cookie-modal')" class="text-xs text-white/50 hover:text-white uppercase tracking-wider">Back</button>
             </div>
         </div>
     </div>
@@ -298,14 +262,14 @@
             if (modal.classList.contains('opacity-0')) {
                 // Open
                 modal.classList.remove('opacity-0', 'pointer-events-none');
-                setTimeout(() => {
-                    content.classList.remove('scale-90', 'translate-y-4');
+                requestAnimationFrame(() => {
+                    content.classList.remove('scale-95', 'translate-y-4');
                     content.classList.add('scale-100', 'translate-y-0');
-                }, 10);
+                });
             } else {
                 // Close
                 content.classList.remove('scale-100', 'translate-y-0');
-                content.classList.add('scale-90', 'translate-y-4');
+                content.classList.add('scale-95', 'translate-y-4');
                 setTimeout(() => {
                     modal.classList.add('opacity-0', 'pointer-events-none');
                 }, 300);
@@ -316,7 +280,7 @@
             toggleModal(closeId);
             setTimeout(() => {
                 toggleModal(openId);
-            }, 300); // Wait for the first modal's close animation
+            }, 300);
         }
     </script>
 </body>
