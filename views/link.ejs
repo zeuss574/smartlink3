@@ -4,21 +4,82 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/style.css">
-    <link rel="icon" href="<%= thumbnailUrl %>">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-</head>
-<body>
-    <div class="background-blur" style="background-image: url('<%= thumbnailUrl %>');"></div>
-    <div class="container link-page">
-        <img src="<%= thumbnailUrl %>" alt="Album Art" class="album-art">
-        <h1><%= title %></h1>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-        <div class="links-container">
-            <% 
+    <link rel="icon" href="<%= thumbnailUrl %>">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+
+        /* Background Animation */
+        .bg-animate { animation: pulse-bg 10s infinite alternate; }
+        @keyframes pulse-bg {
+            0% { transform: scale(1.1); }
+            100% { transform: scale(1.2); }
+        }
+
+        /* Scrollbar styling */
+        .service-list::-webkit-scrollbar { width: 6px; }
+        .service-list::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+        .service-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+
+        /* Glass Panel */
+        .glass-panel {
+            background: rgba(25, 25, 35, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center overflow-x-hidden relative">
+
+    <!-- Dynamic Background Layer -->
+    <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <!-- The blurred image using your thumbnail variable -->
+        <div class="absolute inset-0 bg-cover bg-center bg-no-repeat blur-3xl brightness-50 scale-110 bg-animate"
+             style="background-image: url('<%= thumbnailUrl %>');">
+        </div>
+        <div class="absolute inset-0 bg-black/40"></div>
+    </div>
+
+    <!-- Cookie/Legal Button (Bottom Left) -->
+    <button onclick="toggleCookieModal()" class="fixed bottom-6 left-6 z-40 w-10 h-10 bg-white/5 hover:bg-white/20 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-all hover:scale-110 shadow-lg group" aria-label="Legal & Cookies">
+        <i class="fas fa-shield-alt text-lg group-hover:rotate-12 transition-transform duration-300"></i>
+    </button>
+
+    <!-- Main Content -->
+    <main class="relative z-10 w-full max-w-md mx-auto p-4 animate-fade-in-up">
+        <div class="glass-panel rounded-xl overflow-hidden shadow-2xl flex flex-col">
+            
+            <!-- Header Section -->
+            <div class="p-6 flex flex-col items-center text-center border-b border-white/10">
+                <!-- Album Art -->
+                <div class="relative w-48 h-48 md:w-56 md:h-56 mb-6 shadow-2xl rounded-lg overflow-hidden group">
+                    <img src="<%= thumbnailUrl %>" 
+                         alt="Album Art" 
+                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    <!-- Playing Indicator -->
+                    <div class="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md p-2 rounded-full">
+                        <i class="fas fa-music text-white text-xs"></i>
+                    </div>
+                </div>
+
+                <!-- Title -->
+                <h1 class="text-xl md:text-2xl font-bold text-white mb-1 tracking-tight"><%= title %></h1>
+            </div>
+
+            <!-- Services List (Your Loop Logic) -->
+            <div class="p-4 space-y-3 service-list max-h-[50vh] overflow-y-auto">
+                <% 
                 let allPlatformKeys = Object.keys(links);
                 allPlatformKeys.sort((a, b) => {
                     const indexA = preferredOrder.indexOf(a);
@@ -37,23 +98,95 @@
                     const iconSlug = info ? info.iconSlug : platformKey.toLowerCase();
                     const displayName = info ? info.displayName : formatPlatformName(platformKey);
                 %>
-                    <a href="<%= link.url %>" target="_blank" class="link-button">
-                        <div class="link-content">
-                            <% if (info && info.iconUrl) { %>
-                                <img src="<%= info.iconUrl %>" alt="<%= displayName %> logo" class="logo">
-                            <% } else if (platformKey === 'amazonStore') { %>
-                                <img src="https://services.linkfire.com/logo_amazon_onlight.svg" alt="<%= displayName %> logo" class="logo">
-                            <% } else if (platformKey === 'boomplay') { %>
-                                <img src="https://assets.ffm.to/images/logo/music-service_boomplay_updated.png" alt="<%= displayName %> logo" class="logo">
-                            <% } else { %>
-                                <img src="https://services.linkfire.com/logo_<%= iconSlug %>_onlight.svg" alt="<%= displayName %> logo" class="logo">
-                            <% } %>
-                            <span class="platform-name"><%= displayName %></span>
+                    <a href="<%= link.url %>" target="_blank" class="block group">
+                        <div class="flex items-center justify-between p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-transparent hover:border-white/5">
+                            <div class="flex items-center gap-4">
+                                <!-- Logo Logic -->
+                                <div class="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 p-1">
+                                    <% if (info && info.iconUrl) { %>
+                                        <img src="<%= info.iconUrl %>" alt="<%= displayName %> logo" class="w-full h-full object-contain">
+                                    <% } else if (platformKey === 'amazonStore') { %>
+                                        <img src="https://services.linkfire.com/logo_amazon_onlight.svg" alt="<%= displayName %> logo" class="w-full h-full object-contain">
+                                    <% } else if (platformKey === 'boomplay') { %>
+                                        <img src="https://assets.ffm.to/images/logo/music-service_boomplay_updated.png" alt="<%= displayName %> logo" class="w-full h-full object-contain">
+                                    <% } else { %>
+                                        <img src="https://services.linkfire.com/logo_<%= iconSlug %>_onlight.svg" onerror="this.style.display='none'" alt="<%= displayName %> logo" class="w-full h-full object-contain">
+                                    <% } %>
+                                </div>
+                                <span class="font-medium text-gray-100 text-sm"><%= displayName %></span>
+                            </div>
+                            
+                            <!-- Chevron / Action Icon -->
+                            <div class="w-8 h-8 flex items-center justify-center rounded-full border border-white/20 group-hover:bg-white group-hover:text-black transition-all">
+                                <i class="fas fa-chevron-right text-xs"></i>
+                            </div>
                         </div>
-                        <i class="fas fa-chevron-right"></i>
                     </a>
                 <% }); %>
+            </div>
+            
+            <!-- Footer removed as requested -->
+        </div>
+    </main>
+
+    <!-- Legal/Cookie Modal Pop-up -->
+    <div id="cookie-modal" class="fixed inset-0 z-50 flex items-center justify-center px-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="toggleCookieModal()"></div>
+        <!-- Content -->
+        <div class="bg-gray-900 border border-white/10 p-6 rounded-xl shadow-2xl max-w-xs w-full relative z-10 transform scale-95 transition-transform duration-300" id="cookie-content">
+            <div class="text-center">
+                <div class="w-12 h-12 bg-white/5 border border-white/10 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300 text-xl shadow-lg">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2">Legal & Privacy</h3>
+                <p class="text-xs text-gray-400 mb-6 leading-relaxed">
+                    By using this service, you agree to our use of cookies to enhance your experience and analyze traffic.
+                </p>
+                
+                <button onclick="toggleCookieModal()" class="w-full py-2.5 px-4 bg-white text-black font-bold text-sm rounded-lg hover:bg-gray-200 transition-colors shadow-lg mb-4">
+                    I Agree
+                </button>
+
+                <!-- Links -->
+                <div class="flex justify-center gap-3 text-[10px] text-gray-500 font-medium border-t border-white/5 pt-4">
+                    <a href="#" class="hover:text-white transition-colors hover:underline">Privacy Policy</a>
+                    <span>•</span>
+                    <a href="#" class="hover:text-white transition-colors hover:underline">Terms of Service</a>
+                </div>
+            </div>
         </div>
     </div>
+
+    <script>
+        // Toggle Cookie Modal
+        function toggleCookieModal() {
+            const modal = document.getElementById('cookie-modal');
+            const content = document.getElementById('cookie-content');
+            
+            if (modal.classList.contains('opacity-0')) {
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            } else {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                content.classList.remove('scale-100');
+                content.classList.add('scale-95');
+            }
+        }
+
+        // Animation on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const main = document.querySelector('main');
+            main.style.opacity = '0';
+            main.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                main.style.transition = 'all 0.8s cubic-bezier(0.22, 1, 0.36, 1)';
+                main.style.opacity = '1';
+                main.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
 </body>
 </html>
