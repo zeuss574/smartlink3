@@ -12,73 +12,134 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Google Fonts (Inter) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="icon" href="<%= thumbnailUrl %>">
 
     <style>
-        body { font-family: 'Inter', sans-serif; }
-
-        /* Background Animation */
-        .bg-animate { animation: pulse-bg 10s infinite alternate; }
-        @keyframes pulse-bg {
-            0% { transform: scale(1.1); }
-            100% { transform: scale(1.2); }
+        :root {
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-surface: rgba(20, 20, 20, 0.6);
         }
 
-        /* Scrollbar styling */
-        .service-list::-webkit-scrollbar { width: 6px; }
-        .service-list::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
-        .service-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
-
-        /* Glass Panel */
-        .glass-panel {
-            background: rgba(25, 25, 35, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #000;
+            -webkit-font-smoothing: antialiased;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
+
+        /* --- VisionOS Style Glass --- */
+        .ios-glass {
+            background: var(--glass-surface);
+            backdrop-filter: blur(50px) saturate(180%);
+            -webkit-backdrop-filter: blur(50px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+        }
+
+        /* Floating Glass Button */
+        .glass-button {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .glass-button:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .glass-button:active {
+            transform: scale(0.98);
+        }
+
+        /* Fade In Animation */
+        .fade-in-up {
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Background Breath Animation */
+        .bg-breath { animation: breath 20s ease-in-out infinite alternate; }
+        @keyframes breath {
+            0% { transform: scale(1.1); opacity: 0.4; }
+            100% { transform: scale(1.3); opacity: 0.6; }
+        }
+
+        /* Scrollbar Styling */
+        .service-list::-webkit-scrollbar { width: 4px; }
+        .service-list::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+        .service-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        
+        /* Modal Content Scrollbar */
+        .legal-content::-webkit-scrollbar { width: 4px; }
+        .legal-content::-webkit-scrollbar-track { background: transparent; }
+        .legal-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 10px; }
     </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center overflow-x-hidden relative">
+<body class="min-h-screen flex items-center justify-center selection:bg-white/20 py-10">
 
-    <!-- Dynamic Background Layer -->
+    <!-- Dynamic Background Layers -->
     <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <!-- The blurred image using your thumbnail variable -->
-        <div class="absolute inset-0 bg-cover bg-center bg-no-repeat blur-3xl brightness-50 scale-110 bg-animate"
+        <div class="absolute inset-0 bg-[#050505]"></div>
+        <!-- Aura -->
+        <div class="absolute inset-0 bg-cover bg-center bg-no-repeat blur-[100px] bg-breath"
              style="background-image: url('<%= thumbnailUrl %>');">
         </div>
-        <div class="absolute inset-0 bg-black/40"></div>
+        <!-- Noise -->
+        <div class="absolute inset-0 opacity-[0.03]" style="background-image: url('https://grainy-gradients.vercel.app/noise.svg');"></div>
+        <!-- Vignette -->
+        <div class="absolute inset-0 bg-radial-gradient(circle at center, transparent 0%, #000 100%) opacity-60"></div>
     </div>
 
-    <!-- Cookie/Legal Button (Bottom Left) -->
-    <button onclick="toggleCookieModal()" class="fixed bottom-6 left-6 z-40 w-10 h-10 bg-white/5 hover:bg-white/20 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-all hover:scale-110 shadow-lg group" aria-label="Legal & Cookies">
-        <i class="fas fa-shield-alt text-lg group-hover:rotate-12 transition-transform duration-300"></i>
+    <!-- Floating Cookie Orb -->
+    <button onclick="toggleModal('cookie-modal')" class="fixed bottom-8 left-8 z-40 w-12 h-12 ios-glass rounded-full flex items-center justify-center text-white/80 hover:text-white transition-all hover:scale-110 group shadow-[0_0_20px_rgba(255,255,255,0.1)] cursor-pointer" aria-label="Legal & Cookies">
+        <i class="fas fa-cookie text-lg group-hover:rotate-12 transition-transform duration-500"></i>
     </button>
 
-    <!-- Main Content -->
-    <main class="relative z-10 w-full max-w-md mx-auto p-4 animate-fade-in-up">
-        <div class="glass-panel rounded-xl overflow-hidden shadow-2xl flex flex-col">
-            
+    <!-- Main Card -->
+    <main class="relative z-10 w-full max-w-[400px] mx-auto px-4 fade-in-up">
+        
+        <div class="ios-glass rounded-[36px] flex flex-col overflow-hidden relative">
+            <!-- Glass Sheen -->
+            <div class="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none"></div>
+
             <!-- Header Section -->
-            <div class="p-6 flex flex-col items-center text-center border-b border-white/10">
+            <div class="pt-10 pb-6 flex flex-col items-center text-center relative z-10">
                 <!-- Album Art -->
-                <div class="relative w-48 h-48 md:w-56 md:h-56 mb-6 shadow-2xl rounded-lg overflow-hidden group">
+                <div class="relative w-52 h-52 mb-8 group perspective-1000">
+                    <div class="absolute -bottom-4 inset-x-4 h-4 bg-black/40 blur-xl rounded-full transition-all group-hover:scale-90"></div>
                     <img src="<%= thumbnailUrl %>" 
                          alt="Album Art" 
-                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                    <!-- Playing Indicator -->
-                    <div class="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md p-2 rounded-full">
-                        <i class="fas fa-music text-white text-xs"></i>
+                         class="w-full h-full object-cover rounded-[20px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 transition-transform duration-700 ease-out group-hover:transform group-hover:rotate-y-12 group-hover:-translate-y-2">
+                    <!-- Play icon overlay -->
+                    <div class="absolute bottom-4 right-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-lg">
+                        <i class="fas fa-music text-white/90 text-[10px]"></i>
                     </div>
                 </div>
 
-                <!-- Title -->
-                <h1 class="text-xl md:text-2xl font-bold text-white mb-1 tracking-tight"><%= title %></h1>
+                <!-- Title Info -->
+                <div class="px-6">
+                    <h1 class="text-2xl font-bold text-white mb-1.5 tracking-tight drop-shadow-md"><%= title %></h1>
+                    <p class="text-sm text-white/60 font-medium tracking-wide uppercase">Choose Music Service</p>
+                </div>
             </div>
 
-            <!-- Services List (Your Loop Logic) -->
-            <div class="p-4 space-y-3 service-list max-h-[50vh] overflow-y-auto">
+            <!-- Service List Container -->
+            <div class="px-4 pb-6 space-y-2.5 service-list max-h-[50vh] overflow-y-auto relative z-10">
                 <% 
                 let allPlatformKeys = Object.keys(links);
                 allPlatformKeys.sort((a, b) => {
@@ -98,95 +159,165 @@
                     const iconSlug = info ? info.iconSlug : platformKey.toLowerCase();
                     const displayName = info ? info.displayName : formatPlatformName(platformKey);
                 %>
-                    <a href="<%= link.url %>" target="_blank" class="block group">
-                        <div class="flex items-center justify-between p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-transparent hover:border-white/5">
-                            <div class="flex items-center gap-4">
-                                <!-- Logo Logic -->
-                                <div class="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 p-1">
-                                    <% if (info && info.iconUrl) { %>
-                                        <img src="<%= info.iconUrl %>" alt="<%= displayName %> logo" class="w-full h-full object-contain">
-                                    <% } else if (platformKey === 'amazonStore') { %>
-                                        <img src="https://services.linkfire.com/logo_amazon_onlight.svg" alt="<%= displayName %> logo" class="w-full h-full object-contain">
-                                    <% } else if (platformKey === 'boomplay') { %>
-                                        <img src="https://assets.ffm.to/images/logo/music-service_boomplay_updated.png" alt="<%= displayName %> logo" class="w-full h-full object-contain">
-                                    <% } else { %>
-                                        <img src="https://services.linkfire.com/logo_<%= iconSlug %>_onlight.svg" onerror="this.style.display='none'" alt="<%= displayName %> logo" class="w-full h-full object-contain">
-                                    <% } %>
-                                </div>
-                                <span class="font-medium text-gray-100 text-sm"><%= displayName %></span>
+                    <a href="<%= link.url %>" target="_blank" class="glass-button rounded-[18px] flex items-center justify-between p-3 group">
+                        <div class="flex items-center gap-4">
+                            <!-- Logo Container -->
+                            <div class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 shadow-inner backdrop-blur-sm shrink-0">
+                                <% if (info && info.iconUrl) { %>
+                                    <img src="<%= info.iconUrl %>" alt="<%= displayName %>" class="w-5 h-5 object-contain filter drop-shadow">
+                                <% } else if (platformKey === 'amazonStore') { %>
+                                    <img src="https://services.linkfire.com/logo_amazon_onlight.svg" alt="Amazon" class="w-5 h-5 object-contain">
+                                <% } else if (platformKey === 'boomplay') { %>
+                                    <img src="https://assets.ffm.to/images/logo/music-service_boomplay_updated.png" alt="Boomplay" class="w-5 h-5 object-contain">
+                                <% } else { %>
+                                    <img src="https://services.linkfire.com/logo_<%= iconSlug %>_onlight.svg" onerror="this.style.display='none'" alt="<%= displayName %>" class="w-5 h-5 object-contain">
+                                <% } %>
                             </div>
-                            
-                            <!-- Chevron / Action Icon -->
-                            <div class="w-8 h-8 flex items-center justify-center rounded-full border border-white/20 group-hover:bg-white group-hover:text-black transition-all">
-                                <i class="fas fa-chevron-right text-xs"></i>
-                            </div>
+                            <span class="font-semibold text-white/90 text-[15px] tracking-wide group-hover:text-white transition-colors truncate"><%= displayName %></span>
+                        </div>
+                        
+                        <!-- Arrow -->
+                        <div class="w-8 h-8 flex items-center justify-center text-white/30 group-hover:text-white group-hover:translate-x-1 transition-all duration-300 shrink-0">
+                            <i class="fas fa-chevron-right text-sm"></i>
                         </div>
                     </a>
                 <% }); %>
             </div>
-            
-            <!-- Footer removed as requested -->
         </div>
     </main>
 
-    <!-- Legal/Cookie Modal Pop-up -->
-    <div id="cookie-modal" class="fixed inset-0 z-50 flex items-center justify-center px-4 opacity-0 pointer-events-none transition-opacity duration-300">
-        <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="toggleCookieModal()"></div>
-        <!-- Content -->
-        <div class="bg-gray-900 border border-white/10 p-6 rounded-xl shadow-2xl max-w-xs w-full relative z-10 transform scale-95 transition-transform duration-300" id="cookie-content">
+    <!-- Cookie Modal -->
+    <div id="cookie-modal" class="fixed inset-0 z-50 flex items-center justify-center px-4 opacity-0 pointer-events-none transition-all duration-500">
+        <div class="absolute inset-0 bg-[#000000]/60 backdrop-blur-md" onclick="toggleModal('cookie-modal')"></div>
+        
+        <div class="ios-glass p-8 rounded-[32px] max-w-xs w-full relative z-10 transform scale-90 translate-y-4 transition-all duration-500 modal-content">
             <div class="text-center">
-                <div class="w-12 h-12 bg-white/5 border border-white/10 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300 text-xl shadow-lg">
-                    <i class="fas fa-shield-alt"></i>
+                <div class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-5 text-white shadow-[0_0_30px_rgba(255,255,255,0.2)]">
+                    <i class="fas fa-cookie text-2xl"></i>
                 </div>
-                <h3 class="text-lg font-bold text-white mb-2">Legal & Privacy</h3>
-                <p class="text-xs text-gray-400 mb-6 leading-relaxed">
-                    By using this service, you agree to our use of cookies to enhance your experience and analyze traffic.
+                <h3 class="text-xl font-semibold text-white mb-3 tracking-tight">Privacy & Data</h3>
+                <p class="text-sm text-white/60 mb-8 leading-relaxed">
+                    We use cookies to ensure the best experience. By continuing, you agree to our standard terms.
                 </p>
                 
-                <button onclick="toggleCookieModal()" class="w-full py-2.5 px-4 bg-white text-black font-bold text-sm rounded-lg hover:bg-gray-200 transition-colors shadow-lg mb-4">
-                    I Agree
+                <button onclick="toggleModal('cookie-modal')" class="w-full py-3.5 px-6 bg-white text-black font-semibold text-sm rounded-full hover:bg-white/90 hover:scale-[1.02] active:scale-95 transition-all shadow-lg mb-6">
+                    Accept All
                 </button>
 
-                <!-- Links -->
-                <div class="flex justify-center gap-3 text-[10px] text-gray-500 font-medium border-t border-white/5 pt-4">
-                    <a href="#" class="hover:text-white transition-colors hover:underline">Privacy Policy</a>
+                <div class="flex justify-center gap-4 text-[11px] text-white/40 font-medium uppercase tracking-widest">
+                    <button onclick="switchModal('cookie-modal', 'privacy-modal')" class="hover:text-white transition-colors cursor-pointer">Privacy</button>
                     <span>•</span>
-                    <a href="#" class="hover:text-white transition-colors hover:underline">Terms of Service</a>
+                    <button onclick="switchModal('cookie-modal', 'terms-modal')" class="hover:text-white transition-colors cursor-pointer">Terms</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Generic Legal Modal Structure (Privacy) -->
+    <div id="privacy-modal" class="fixed inset-0 z-[60] flex items-center justify-center px-4 opacity-0 pointer-events-none transition-all duration-500">
+        <div class="absolute inset-0 bg-[#000000]/60 backdrop-blur-md" onclick="toggleModal('privacy-modal')"></div>
+        
+        <div class="ios-glass p-6 rounded-[32px] max-w-md w-full relative z-10 transform scale-90 translate-y-4 transition-all duration-500 flex flex-col max-h-[80vh] modal-content">
+            <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-4">
+                <h3 class="text-xl font-semibold text-white">Privacy Policy</h3>
+                <button onclick="toggleModal('privacy-modal')" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+                    <i class="fas fa-times text-white text-sm"></i>
+                </button>
+            </div>
+            
+            <div class="legal-content overflow-y-auto text-left space-y-4 text-white/70 text-sm pr-2">
+                <p><strong>Last updated: October 2024</strong></p>
+                <p>This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information when You use the Service and tells You about Your privacy rights and how the law protects You.</p>
+                
+                <h4 class="text-white font-semibold mt-4">1. Collecting and Using Your Personal Data</h4>
+                <p>While using Our Service, We may ask You to provide Us with certain personally identifiable information that can be used to contact or identify You. Personally identifiable information may include, but is not limited to: Usage Data.</p>
+                
+                <h4 class="text-white font-semibold mt-4">2. Usage Data</h4>
+                <p>Usage Data is collected automatically when using the Service. Usage Data may include information such as Your Device's Internet Protocol address (e.g. IP address), browser type, browser version, the pages of our Service that You visit, the time and date of Your visit, the time spent on those pages, unique device identifiers and other diagnostic data.</p>
+                
+                <h4 class="text-white font-semibold mt-4">3. Tracking Technologies and Cookies</h4>
+                <p>We use Cookies and similar tracking technologies to track the activity on Our Service and store certain information. Tracking technologies used are beacons, tags, and scripts to collect and track information and to improve and analyze Our Service.</p>
+                
+                <h4 class="text-white font-semibold mt-4">4. Security of Your Personal Data</h4>
+                <p>The security of Your Personal Data is important to Us, but remember that no method of transmission over the Internet, or method of electronic storage is 100% secure. While We strive to use commercially acceptable means to protect Your Personal Data, We cannot guarantee its absolute security.</p>
+            </div>
+            
+            <div class="mt-6 pt-4 border-t border-white/10 text-center">
+                <button onclick="switchModal('privacy-modal', 'cookie-modal')" class="text-xs text-white/50 hover:text-white uppercase tracking-wider">
+                    <i class="fas fa-arrow-left mr-1"></i> Back
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generic Legal Modal Structure (Terms) -->
+    <div id="terms-modal" class="fixed inset-0 z-[60] flex items-center justify-center px-4 opacity-0 pointer-events-none transition-all duration-500">
+        <div class="absolute inset-0 bg-[#000000]/60 backdrop-blur-md" onclick="toggleModal('terms-modal')"></div>
+        
+        <div class="ios-glass p-6 rounded-[32px] max-w-md w-full relative z-10 transform scale-90 translate-y-4 transition-all duration-500 flex flex-col max-h-[80vh] modal-content">
+            <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-4">
+                <h3 class="text-xl font-semibold text-white">Terms of Service</h3>
+                <button onclick="toggleModal('terms-modal')" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+                    <i class="fas fa-times text-white text-sm"></i>
+                </button>
+            </div>
+            
+            <div class="legal-content overflow-y-auto text-left space-y-4 text-white/70 text-sm pr-2">
+                <p><strong>Last updated: October 2024</strong></p>
+                <p>Please read these terms and conditions carefully before using Our Service.</p>
+                
+                <h4 class="text-white font-semibold mt-4">1. Interpretation and Definitions</h4>
+                <p>The words of which the initial letter is capitalized have meanings defined under the following conditions. The following definitions shall have the same meaning regardless of whether they appear in singular or in plural.</p>
+                
+                <h4 class="text-white font-semibold mt-4">2. Acknowledgment</h4>
+                <p>These are the Terms and Conditions governing the use of this Service and the agreement that operates between You and the Company. These Terms and Conditions set out the rights and obligations of all users regarding the use of the Service.</p>
+                
+                <h4 class="text-white font-semibold mt-4">3. Links to Other Websites</h4>
+                <p>Our Service may contain links to third-party web sites or services that are not owned or controlled by the Company. The Company has no control over, and assumes no responsibility for, the content, privacy policies, or practices of any third party web sites or services.</p>
+                
+                <h4 class="text-white font-semibold mt-4">4. Termination</h4>
+                <p>We may terminate or suspend Your access immediately, without prior notice or liability, for any reason whatsoever, including without limitation if You breach these Terms and Conditions.</p>
+
+                <h4 class="text-white font-semibold mt-4">5. "AS IS" and "AS AVAILABLE" Disclaimer</h4>
+                <p>The Service is provided to You "AS IS" and "AS AVAILABLE" and with all faults and defects without warranty of any kind. To the maximum extent permitted under applicable law, the Company expressly disclaims all warranties, whether express, implied, statutory or otherwise.</p>
+            </div>
+            
+            <div class="mt-6 pt-4 border-t border-white/10 text-center">
+                <button onclick="switchModal('terms-modal', 'cookie-modal')" class="text-xs text-white/50 hover:text-white uppercase tracking-wider">
+                    <i class="fas fa-arrow-left mr-1"></i> Back
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Toggle Cookie Modal
-        function toggleCookieModal() {
-            const modal = document.getElementById('cookie-modal');
-            const content = document.getElementById('cookie-content');
+        function toggleModal(modalId) {
+            const modal = document.getElementById(modalId);
+            const content = modal.querySelector('.modal-content');
             
             if (modal.classList.contains('opacity-0')) {
+                // Open
                 modal.classList.remove('opacity-0', 'pointer-events-none');
-                content.classList.remove('scale-95');
-                content.classList.add('scale-100');
+                setTimeout(() => {
+                    content.classList.remove('scale-90', 'translate-y-4');
+                    content.classList.add('scale-100', 'translate-y-0');
+                }, 10);
             } else {
-                modal.classList.add('opacity-0', 'pointer-events-none');
-                content.classList.remove('scale-100');
-                content.classList.add('scale-95');
+                // Close
+                content.classList.remove('scale-100', 'translate-y-0');
+                content.classList.add('scale-90', 'translate-y-4');
+                setTimeout(() => {
+                    modal.classList.add('opacity-0', 'pointer-events-none');
+                }, 300);
             }
         }
 
-        // Animation on load
-        document.addEventListener('DOMContentLoaded', () => {
-            const main = document.querySelector('main');
-            main.style.opacity = '0';
-            main.style.transform = 'translateY(20px)';
-            
+        function switchModal(closeId, openId) {
+            toggleModal(closeId);
             setTimeout(() => {
-                main.style.transition = 'all 0.8s cubic-bezier(0.22, 1, 0.36, 1)';
-                main.style.opacity = '1';
-                main.style.transform = 'translateY(0)';
-            }, 100);
-        });
+                toggleModal(openId);
+            }, 300); // Wait for the first modal's close animation
+        }
     </script>
 </body>
 </html>
